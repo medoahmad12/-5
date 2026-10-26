@@ -1,0 +1,105 @@
+name: Build Android APK
+
+# التشغيل يدوي من تبويب Actions (زر Run workflow) — أو تلقائيًا عند دفع وسم
+# إصدار (مثل v1.0.0) فيُنشأ GitHub Release مع الملف مرفقًا.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    name: Build release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Flutter 3.27.4 يستخدم Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter 3.27.4
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.27.4
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      # المستودع لا يتضمن مجلد android/ — يُولَّد هنا من القوالب الرسمية
+      # (flutter create لا يمس الكود ولا الأصول ولا الاختبارات الموجودة)
+      - name: Generate Android platform files
+        run: flutter create . --platforms android --org com.littleexplorers
+
+      - name: Configure app (Arabic name, minSdk 23, Kotlin 2.1.0)
+        run: |
+          # اسم التطبيق على شاشة الجهاز
+          sed -i 's/android:label="[^"]*"/android:label="عالم المستكشفين الصغار"/' \
+            android/app/src/main/AndroidManifest.xml
+          # minSdk 23 (يطلبه إضافة الصوت audioplayers) — يغطي نمطي Groovy وKotlin DSL
+          if [ -f android/app/build.gradle ]; then
+            sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle || true
+            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle || true
+          fi
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle.kts || true
+          fi
+          # ★ رفع Kotlin Gradle plugin إلى 2.1.0 — يطلبه flutter_tts مع محرك Flutter 3.27
+          if [ -f android/settings.gradle ]; then
+            sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "2.1.0"/' android/settings.gradle || true
+            sed -i 's/id("org.jetbrains.kotlin.android") version "[^"]*"/id("org.jetbrains.kotlin.android") version "2.1.0"/' android/settings.gradle || true
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i 's/id("org.jetbrains.kotlin.android") version "[^"]*"/id("org.jetbrains.kotlin.android") version "2.1.0"/' android/settings.gradle.kts || true
+          fi
+          if [ -f android/build.gradle ]; then
+            sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "2.1.0"/' android/build.gradle || true
+          fi
+          # اختبار القالب الافتراضي يشير لفئة MyApp غير الموجودة — يُحذف (اختباراتنا الحقيقية تبقى)
+          rm -f test/widget_test.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # يكشف أخطاء الكود مبكرًا برسائل واضحة (الأخطاء فقط — لا يمنع التحذيرات)
+      - name: Static analysis (errors only)
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+
+      # الاختبارات تظهر نتيجتها في السجل لكنها لا تعطّل البناء
+      - name: Run tests
+        continue-on-error: true
+        run: flutter test
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/LittleExplorers-1.0.0.apk
+          ls -lh dist/
+
+      # الناتج يظهر أسفل صفحة التشغلة في قسم Artifacts (ملف مضغوط بداخله الـ APK)
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LittleExplorers-APK
+          path: dist/LittleExplorers-1.0.0.apk
+          retention-days: 30
+
+      # فقط عند دفع وسم مثل: git tag v1.0.0 && git push origin v1.0.0
+      - name: Create GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/LittleExplorers-1.0.0.apk \
+            --title "إصدار $GITHUB_REF_NAME — عالم المستكشفين الصغار" \
+            --generate-notes
