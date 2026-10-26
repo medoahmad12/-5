@@ -1,0 +1,47 @@
+name: little_explorers
+description: >-
+  عالم المستكشفين الصغار — Little Explorers World.
+  A bilingual (Arabic/English) educational adventure app for kids aged 3-5.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+  audioplayers: ^6.1.0
+  flutter_tts: ^4.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/bg/
+    - assets/images/chars/
+    - assets/images/objects/
+    - assets/audio/en/
+    - assets/audio/sfx/
+    - assets/audio/music/
+    - assets/icon.png
+
+  fonts:
+    - family: BalooBhaijaan2
+      fonts:
+        - asset: assets/fonts/BalooBhaijaan2-400.ttf
+        - asset: assets/fonts/BalooBhaijaan2-600.ttf
+          weight: 600
+        - asset: assets/fonts/BalooBhaijaan2-700.ttf
+          weight: 700
+        - asset: assets/fonts/BalooBhaijaan2-800.ttf
+          weight: 800
