@@ -76,18 +76,23 @@ jobs:
       - name: Generate Android platform files
         run: flutter create . --platforms android --org com.littleexplorers
 
-      - name: Configure app (Arabic name, minSdk 23, Kotlin 2.1.0)
+      - name: Configure app (Arabic name, minSdk 24, compileSdk 36, Kotlin 2.1.0)
         run: |
           # اسم التطبيق على شاشة الجهاز
           sed -i 's/android:label="[^"]*"/android:label="عالم المستكشفين الصغار"/' \
             android/app/src/main/AndroidManifest.xml
-          # minSdk 23 (يطلبه إضافة الصوت audioplayers) — يغطي نمطي Groovy وKotlin DSL
+          # ★ minSdk 24 — تطلبه النسخ الحديثة من إضافة النطق flutter_tts
+          # ★ compileSdk 36 — تطلبه الإضافة نفسها (التوافق تنازلي: يعمل على أندرويد 7 فما فوق)
+          # يغطي نمطي Groovy وKotlin DSL
           if [ -f android/app/build.gradle ]; then
-            sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle || true
-            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle || true
+            sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' android/app/build.gradle || true
+            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' android/app/build.gradle || true
+            sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 36/' android/app/build.gradle || true
+            sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' android/app/build.gradle || true
           fi
           if [ -f android/app/build.gradle.kts ]; then
-            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle.kts || true
+            sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' android/app/build.gradle.kts || true
+            sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' android/app/build.gradle.kts || true
           fi
           # ★ رفع Kotlin Gradle plugin إلى 2.1.0 — يطلبه flutter_tts مع محرك Flutter 3.27
           if [ -f android/settings.gradle ]; then
