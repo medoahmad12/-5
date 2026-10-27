@@ -300,8 +300,8 @@ class ParentDashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
