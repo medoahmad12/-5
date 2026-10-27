@@ -103,6 +103,29 @@ jobs:
           # اختبار القالب الافتراضي يشير لفئة MyApp غير الموجودة — يُحذف (اختباراتنا الحقيقية تبقى)
           rm -f test/widget_test.dart
 
+      # التطبيق مصمم ببدائل مرسومة (Glyphs) فلا يتعطل غياب الصور/الأصوات.
+      # هذه الخطوة تضمن أن البناء ينجح حتى لو لم تُرفع مجلدات assets بعد،
+      # وبمجرد رفع الأصول الحقيقية لاحقًا يستخدمها البناء تلقائيًا بلا تعديل.
+      - name: Prepare assets (build works with or without media files)
+        run: |
+          # 1) أنشئ أي مجلد أصول مُعلَن في pubspec وغير موجود على المستودع
+          for d in assets/images/bg assets/images/chars assets/images/objects \
+                   assets/audio/en assets/audio/sfx assets/audio/music; do
+            mkdir -p "$d"
+            # ملف فارغ حتى لا يبقى المجلد خاليًا تمامًا (يُستبدل تلقائيًا عند رفع الأصول الحقيقية)
+            [ -n "$(ls -A "$d" 2>/dev/null)" ] || touch "$d/.gitkeep"
+          done
+          # 2) أيقونة مؤقتة من قالب Flutter حتى تُرفع الأيقونة الحقيقية
+          if [ ! -f assets/icon.png ] && [ -f android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png ]; then
+            cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png assets/icon.png
+            echo "Temporary app icon copied from Flutter template."
+          fi
+          # 3) إن لم تُرفع ملفات الخط بعد، أزل قسم fonts من pubspec حتى لا يفشل البناء
+          if [ ! -f assets/fonts/BalooBhaijaan2-400.ttf ]; then
+            sed -i '/^  fonts:/,$d' pubspec.yaml
+            echo "Font files not found in repo -> fonts section removed for this build."
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
