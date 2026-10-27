@@ -11,10 +11,48 @@ jobs:
   build:
     name: Build release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # منظم تلقائي: أي ملف .dart مرفوع بالخطأ على جذر المستودع (بدل مجلده
+      # داخل lib/) يُنقل هنا إلى مجلده الصحيح ويُحفظ التعديل في المستودع.
+      - name: Auto-organize stray .dart files from repo root
+        if: startsWith(github.ref, 'refs/heads/')
+        run: |
+          shopt -s nullglob
+          moved=0
+          for f in *.dart; do
+            case "$f" in
+              *_game.dart)              dest="lib/games" ;;
+              *_screen.dart)            dest="lib/screens" ;;
+              *_service.dart)           dest="lib/services" ;;
+              worlds.dart)              dest="lib/data" ;;
+              app_strings.dart)         dest="lib/l10n" ;;
+              app.dart)                 dest="lib" ;;
+              celebration_overlay.dart) dest="lib/widgets" ;;
+              *)                        dest="" ;;
+            esac
+            if [ -n "$dest" ]; then
+              mkdir -p "$dest"
+              mv -f "$f" "$dest/"
+              echo "Moved $f -> $dest/"
+              moved=1
+            else
+              rm -f "$f"
+              echo "Deleted unknown stray file: $f"
+            fi
+          done
+          if [ "$moved" = "1" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: auto-organize misplaced dart files into lib/"
+            git push
+          fi
 
       # Flutter 3.27.4 يستخدم Java 17
       - name: Set up JDK 17
