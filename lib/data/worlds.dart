@@ -1,3 +1,4 @@
+import '../core/constants/app_assets.dart';
 import '../core/constants/app_colors.dart';
 import 'models.dart';
 import 'content_arabic.dart';

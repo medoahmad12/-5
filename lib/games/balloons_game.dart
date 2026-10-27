@@ -7,6 +7,7 @@ import '../core/constants/app_colors.dart';
 import '../core/utils/helpers.dart';
 import '../core/utils/size_config.dart';
 import '../data/models.dart';
+import '../game_engine/game_utils.dart';
 import '../game_engine/instruction_bar.dart';
 import '../l10n/app_strings.dart';
 import '../services/audio_service.dart';
@@ -37,7 +38,7 @@ class _Balloon {
   final double x; // 0..1 horizontal position
   final double speed; // rise speed factor
   final double phase;
-  bool popped;
+  bool popped = false;
   _Balloon({
     required this.id,
     required this.color,

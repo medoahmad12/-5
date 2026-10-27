@@ -13,6 +13,7 @@ import '../l10n/app_strings.dart';
 import '../services/audio_service.dart';
 import '../services/haptics_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/gradient_glyph.dart';
 import '../widgets/option_card.dart';
 
 /// Find the hidden letters inside a busy scene.
@@ -41,7 +42,7 @@ class _Tile {
   final Color color;
   final Offset pos; // fractional 0..1
   final double rot;
-  bool found;
+  bool found = false;
   _Tile({
     required this.glyph,
     required this.color,

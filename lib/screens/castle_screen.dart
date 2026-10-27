@@ -5,6 +5,7 @@ import '../core/constants/app_assets.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/helpers.dart';
 import '../core/utils/size_config.dart';
+import '../data/models.dart';
 import '../data/worlds.dart';
 import '../l10n/app_strings.dart';
 import '../services/progress_service.dart';
@@ -42,6 +43,7 @@ class CastleScreen extends StatelessWidget {
                       _counter(
                         icon: Icons.star_rounded,
                         value: total,
+                        arabic: context.isAr,
                         label: context.tr('totalStars'),
                         color: AppColors.star,
                       ),
@@ -49,6 +51,7 @@ class CastleScreen extends StatelessWidget {
                       _counter(
                         icon: Icons.emoji_events_rounded,
                         value: progress.lessonsDone,
+                        arabic: context.isAr,
                         label: context.tr('lessonsDone'),
                         color: AppColors.gold,
                       ),
@@ -56,6 +59,7 @@ class CastleScreen extends StatelessWidget {
                       _counter(
                         icon: Icons.card_giftcard_rounded,
                         value: progress.chestsOpened,
+                        arabic: context.isAr,
                         label: context.tr('chests'),
                         color: AppColors.coral,
                       ),
@@ -137,6 +141,7 @@ class CastleScreen extends StatelessWidget {
     required int value,
     required String label,
     required Color color,
+    required bool arabic,
   }) {
     return Container(
       padding:
@@ -156,7 +161,7 @@ class CastleScreen extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 26.sp),
           Text(
-            Helpers.digits(value, arabic: context.isAr),
+            Helpers.digits(value, arabic: arabic),
             style: TextStyle(
                 fontSize: 20.sp, fontWeight: FontWeight.w800),
           ),

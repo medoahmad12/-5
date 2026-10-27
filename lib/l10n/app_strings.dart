@@ -155,7 +155,7 @@ class S {
 
 extension TrContext on BuildContext {
   bool get isAr =>
-      Localizations.localeOf(this, nullOk: true)?.languageCode != 'en';
+      Localizations.localeOf(this).languageCode != 'en';
 
   String tr(String key) => S.trOf(key, isAr);
 

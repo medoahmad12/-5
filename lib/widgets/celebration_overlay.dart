@@ -163,7 +163,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
                     padding:
                         EdgeInsets.symmetric(horizontal: 30.sp, vertical: 12.sp),
                     decoration: BoxDecoration(
-                      gradient: AppColors.grad('sun'),
+                      gradient: LinearGradient(colors: AppColors.grad('sun')),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(

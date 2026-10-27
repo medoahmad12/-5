@@ -5,6 +5,7 @@ import '../core/constants/app_assets.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/helpers.dart';
 import '../core/utils/size_config.dart';
+import '../data/models.dart';
 import '../data/worlds.dart';
 import '../l10n/app_strings.dart';
 import '../services/audio_service.dart';
@@ -299,8 +300,8 @@ class ParentDashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

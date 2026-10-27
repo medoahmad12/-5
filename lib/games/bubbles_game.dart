@@ -7,6 +7,7 @@ import '../core/constants/app_colors.dart';
 import '../core/utils/helpers.dart';
 import '../core/utils/size_config.dart';
 import '../data/models.dart';
+import '../game_engine/game_utils.dart';
 import '../game_engine/instruction_bar.dart';
 import '../l10n/app_strings.dart';
 import '../services/audio_service.dart';
@@ -41,7 +42,7 @@ class _Bubble {
   final double x;
   final double speed;
   final double phase;
-  bool popped;
+  bool popped = false;
   _Bubble({
     required this.id,
     required this.glyph,

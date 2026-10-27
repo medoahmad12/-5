@@ -17,9 +17,9 @@ class TtsService {
   Future<void> init() async {
     try {
       final tts = FlutterTts();
-      await tts.setStartHandler(() {});
-      await tts.setCompletionHandler(() {});
-      await tts.setErrorHandler((msg) {});
+      tts.setStartHandler(() {});
+      tts.setCompletionHandler(() {});
+      tts.setErrorHandler((msg) {});
       // Kid-friendly voice: slow-ish rate, slightly higher pitch.
       await tts.setSpeechRate(0.42);
       await tts.setPitch(1.15);

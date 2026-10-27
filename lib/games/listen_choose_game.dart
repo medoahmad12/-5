@@ -110,7 +110,7 @@ class _ListenChooseGameState extends State<ListenChooseGame> {
             height: 92.sp.clamp(76.0, 110.0),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: AppColors.grad('sun'),
+              gradient: LinearGradient(colors: AppColors.grad('sun')),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.sun.withOpacity(0.5),
